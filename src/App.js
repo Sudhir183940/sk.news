@@ -2,14 +2,14 @@ import './App.css';
 import Navbar from './Components/Navbar';
 import React from 'react';
 import News from './Components/News';
-import {BrowserRouter, Routes,Route} from "react-router-dom";
+import {HashRouter as Router, Routes,Route} from "react-router-dom";
 import About from './Components/About';
 
 const App=()=> {
 
     return (
-       <BrowserRouter>
-        <Navbar />
+      <Router>
+       <Navbar />
      <Routes>
 
         <Route path="/" exact element={<News key='general'  domains='indiatoday.in,ndtv.com' category='general'/>}/>
@@ -24,7 +24,7 @@ const App=()=> {
 
         </Routes>
         
-      </BrowserRouter>
+      </Router>
     )
 }
 
