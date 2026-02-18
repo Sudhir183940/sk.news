@@ -25,15 +25,16 @@ const News = (props) => {
     setLoading(true)
     let data = await fetch(url)
     let parseData = await data.json()
-    setArticles(parseData.articles)
-    setTotalResults(parseData.totalResults)
+    setArticles(parseData.articles || [])
+    setTotalResults(parseData.totalResults || 0)
     setLoading(false)
   };
-   
+  
   useEffect(() => {
     updateNews();
-  // eslint-disable-next-line 
-  },[totalResults]);
+    // run only once on mount
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  },[]);
  
 
   // async componentDidMount() {
@@ -54,8 +55,8 @@ const News = (props) => {
     // this.setState({loading:true});
     let  data = await fetch(url)
     let parseData = await data.json()
-    setArticles(articles.concat(parseData.articles))
-    setTotalResults((parseData.totalResults))
+    setArticles(prev => prev.concat(parseData.articles || []))
+    setTotalResults(parseData.totalResults || 0)
     // setLoading(false)
   };
 
@@ -69,7 +70,7 @@ const News = (props) => {
       {/* {this.state.loading && <Spinner />} */}
 
       <InfiniteScroll
-        dataLength={articles.length}
+        dataLength={articles?.length || 0}
         next={fetchMoreData}
         hasMore={page !== 10}
         loader={<Spinner />}
