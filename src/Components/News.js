@@ -9,6 +9,7 @@ const News = (props) => {
   const [loading, setLoading] = useState(false)
   const [page, setPage] = useState(1)
   const [totalResults, setTotalResults] = useState(0)
+  const [error, setError] = useState(null)
 
   // constructor() {
   //   super();
@@ -23,11 +24,32 @@ const News = (props) => {
   const updateNews =async () => {
     const url = `https://newsapi.org/v2/everything?domains=${props.domains}&q=${props.category}&apiKey=479acde88aab459ab45139661ec15233&page=1&pageSize=10&language=en&sortBy=publishedAt`;
     setLoading(true)
-    let data = await fetch(url)
-    let parseData = await data.json()
-    setArticles(parseData.articles || [])
-    setTotalResults(parseData.totalResults || 0)
-    setLoading(false)
+    setError(null)
+    try {
+      const res = await fetch(url)
+      if (!res.ok) {
+        let bodyText = ''
+        try {
+          bodyText = await res.text()
+        } catch (e) {
+          bodyText = ''
+        }
+        setError(`Request failed: ${res.status} ${res.statusText} ${bodyText}`)
+        setArticles([])
+        setTotalResults(0)
+        setLoading(false)
+        return
+      }
+      const parseData = await res.json()
+      setArticles(parseData.articles || [])
+      setTotalResults(parseData.totalResults || 0)
+    } catch (err) {
+      setError(err.message || "Network error")
+      setArticles([])
+      setTotalResults(0)
+    } finally {
+      setLoading(false)
+    }
   };
   
   useEffect(() => {
@@ -53,10 +75,25 @@ const News = (props) => {
     setPage(page + 1)
    const url = `https://newsapi.org/v2/everything?domains=${props.domains}&q=${props.category}&apiKey=479acde88aab459ab45139661ec15233&pageSize=10&language=en&sortBy=publishedAt&page=${page+1}`;
     // this.setState({loading:true});
-    let  data = await fetch(url)
-    let parseData = await data.json()
-    setArticles(prev => prev.concat(parseData.articles || []))
-    setTotalResults(parseData.totalResults || 0)
+    setError(null)
+    try {
+      const res = await fetch(url)
+      if (!res.ok) {
+        let bodyText = ''
+        try {
+          bodyText = await res.text()
+        } catch (e) {
+          bodyText = ''
+        }
+        setError(`Request failed: ${res.status} ${res.statusText} ${bodyText}`)
+        return
+      }
+      const parseData = await res.json()
+      setArticles(prev => prev.concat(parseData.articles || []))
+      setTotalResults(parseData.totalResults || 0)
+    } catch (err) {
+      setError(err.message || "Network error")
+    }
     // setLoading(false)
   };
 
@@ -69,10 +106,17 @@ const News = (props) => {
       </div>
       {/* {this.state.loading && <Spinner />} */}
 
+      {error && (
+        <div className="container my-3">
+          <div className="alert alert-warning" role="alert">
+            {error}
+          </div>
+        </div>
+      )}
       <InfiniteScroll
         dataLength={articles?.length || 0}
         next={fetchMoreData}
-        hasMore={page !== 10}
+        hasMore={articles.length < totalResults}
         loader={<Spinner />}
       >
         {/* {this.state.items.map((i, index) => (
