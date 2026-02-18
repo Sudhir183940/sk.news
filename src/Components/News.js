@@ -73,7 +73,7 @@ const News = (props) => {
 
   const fetchMoreData =async () => {
     setPage(page + 1)
-   const url = `https://newsapi.org/v2/everything?domains=${props.domains}&q=${props.category}&apiKey=479acde88aab459ab45139661ec15233&pageSize=10&language=en&sortBy=publishedAt&page=${page+1}`;
+   const url = `https://newsapi.org/v2/everything?domains=${props.domains}&q=${props.category}&apiKey=2739bbc4ee974c7cb216fdf71687162a&pageSize=10&language=en&sortBy=publishedAt&page=${page+1}`;
     // this.setState({loading:true});
     setError(null)
     try {
